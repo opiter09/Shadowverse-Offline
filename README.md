@@ -1,5 +1,5 @@
 # Shadowverse-Offline
-This is a stupid little project that lets you search and sort of play with Shadowverse cards offline. The cards are just images of the text, without artwork or voice acting or anything, so it's nothing like the actual game. And the WIP game engine will have very little actualy rules enforcement, similar to the website 
+This is a stupid little project that lets you search and sort of play with Shadowverse cards offline. The cards are just images of the text, without artwork or voice acting or anything, so it's nothing like the actual game. And the WIP game engine will have very little actual rules enforcement, similar to the website 
 https://untap.in.
 Oh and I don't feel like figuring out LAN, so this will all be done via a hotseat approach. But at least the search doesn't require you to go through all the app's
 menus, and you will be able to play with any card that exists in the game as of March 2023 (or beyond if you are willing to supply your own json).
