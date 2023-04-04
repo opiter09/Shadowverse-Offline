@@ -5,10 +5,17 @@ import json
 import random
 
 def deckImport(table):
-    f = open("deck1.txt", "rt")
+    file1 = psg.popup_get_file("Select the first deck file:", file_types = [("Text Files", "*.txt")])
+    if (os.path.exists(file1) == False):
+        file1 = "deck1.txt"
+    file2 = psg.popup_get_file("Select the second deck file:", file_types = [("Text Files", "*.txt")])
+    if (os.path.exists(file2) == False):
+        file2 = "deck2.txt"
+
+    f = open(file1, "rt")
     deck1 = f.read().split("\n")
     f.close()
-    f = open("deck2.txt", "rt")
+    f = open(file2, "rt")
     deck2 = f.read().split("\n")
     f.close()
     
