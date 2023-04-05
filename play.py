@@ -100,3 +100,18 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         deckC, deckH = deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive)
     if (deckH == None):
         return
+        
+    layout = [[], [], [], [], [], [], []]
+    keyNames = [ "oppnHand", "oppnField", "yourField", "yourHand" ]
+    for i in range(7):
+        if (i in [0, 2, 4, 6]):
+            for j in range(5):
+                layout[i] = layout[i] + [ psg.Button("BLANK " + keyNames[i // 2], key = keyNames[i // 2] + str(j)) ]
+        
+    window = psg.Window("", layout, grab_anywhere = True, resizable = True)
+    while True:
+        event, values = window.read()
+        # See if user wants to quit or window was closed
+        if (event == psg.WINDOW_CLOSED) or (event == "Quit"):
+            break
+    window.close()
