@@ -66,13 +66,26 @@ while True:
         break
 window.close()
 
+subprocess.Popen(["ipconfig"])
+yourAddress = psg.popup_get_text("Enter your IPv4 Address:")
+if (yourAddress == ""):
+    yourAddress = "192.168.1.226"
+theirAddress = psg.popup_get_text("Enter the other person's IPv4 Address:")
+if (theirAddress == ""):
+    theirAddress = "192.168.1.226"
+sockS = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sockR = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 if (result2 == "host"):
-    subprocess.Popen(["ipconfig"])
-address = psg.popup_get_text("Enter the host's IPv4 Address:")
-
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-serverAddress = (address, 10000)
-if (result2 == "host"):
-    sock.bind(serverAddress)
+    yourSend = (yourAddress, 10000)
+    yourReceive = (yourAddress, 10001)
+    theirSend = (theirAddress, 8080)
+    theirReceive = (theirAddress, 8081)
+elif (result2 == "client"):
+    yourSend = (yourAddress, 8080)
+    yourReceive = (yourAddress, 8081)
+    theirSend = (theirAddress, 10000)
+    theirReceive = (theirAddress, 10001)
+sockS.bind(yourSend)
+sockR.bind(yourReceive)
             
-play.playBall(realData, result2, sock, serverAddress)
+play.playBall(realData, result2, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive)
