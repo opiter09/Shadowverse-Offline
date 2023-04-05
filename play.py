@@ -58,7 +58,7 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
             # Find connections
             connection, address = sockR.accept()
             try:
-                packet = connection.recv(4294967296).decode("UTF-8")
+                packet = connection.recv(262144).decode("UTF-8")
             except:
                 connection.close()
                 print("Deck download failed!")
@@ -71,7 +71,7 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
             # Find connections
             connection, address = sockR.accept()
             try:
-                packet = connection.recv(4294967296).decode("UTF-8")
+                packet = connection.recv(262144).decode("UTF-8")
             except:
                 connection.close()
                 print("Deck download failed!")
