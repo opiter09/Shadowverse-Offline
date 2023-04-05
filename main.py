@@ -2,6 +2,8 @@ import os
 import sys
 import PySimpleGUI as psg
 import json
+import subprocess
+import socket
 import combine
 import search
 import play
@@ -46,5 +48,31 @@ window.close()
 
 if (result == "search"):
     search.searchWindow(realData)
-else:
-    play.playBall(realData)
+    exit()
+
+result2 = ""
+layout = [ [ psg.Text("Choose a role:") ], [ psg.Button("Host"), psg.Button("Client") ] ]
+window = psg.Window("", layout)
+while True:
+    event, values = window.read()
+    # See if user wants to quit or window was closed
+    if (event == psg.WINDOW_CLOSED) or (event == "Quit"):
+        break
+    elif (event == "Host"):
+        result2 = "host"
+        break
+    elif (event == "Client"):
+        result2 = "client"
+        break
+window.close()
+
+if (result2 == "host"):
+    subprocess.Popen(["ipconfig"])
+address = psg.popup_get_text("Enter the host's IPv4 Address:")
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+serverAddress = ("localhost", address)
+if (result2 == "host"):
+    sock.bind(serverAddress)
+            
+play.playBall(realData, result2, sock, serverAddress)

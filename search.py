@@ -42,7 +42,7 @@ def searchWindow(table):
         # See if user wants to quit or window was closed
         if (event == psg.WINDOW_CLOSED) or (event == "Quit"):
             break
-        elif ((event == "execute") or (event in [ "\r", "special 16777220", "special 16777221" ])):
+        elif ((event == "execute") or (event in [ "\r", "special 16777220", "special 16777221" ])): # if you press the Search button or Enter
             subset = []
             for card in table:
                 if ((values["name"].lower() in card["card_name"].lower()) and (values["text"].lower() in card["skill_disc"].lower())):

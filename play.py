@@ -73,7 +73,7 @@ def deckImport(table):
     
     return(deck1, deck2)
 
-def playBall(table):
+def playBall(table, role, sock, serverAddress):
     deck1, deck2 = deckImport(table)
     if (deck1 == None):
         return
