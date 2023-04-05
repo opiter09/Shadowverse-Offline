@@ -24,7 +24,7 @@ def searchWindow(table):
             psg.Text("Max Attack:"), psg.DropDown([str(x) for x in ["Any"] + list(range(21))], key = "maxAttack", default_value = "Any"),
             psg.Text("Max Life:"), psg.DropDown([str(x) for x in ["Any"] + list(range(21))], key = "maxLife", default_value = "Any")
         ],
-        [ psg.DropDown(pages, key = "page", default_value = "Page 1"), psg.Button("Search", key = "execute") ]
+        [ psg.Text(" " * 59), psg.DropDown(pages, key = "page", default_value = "Page 1"), psg.Button("Search", key = "execute") ]
     ]
     textList = [""] * 10
     for i in range(10):
@@ -35,14 +35,14 @@ def searchWindow(table):
             psg.Button("View Card", key = "view" + str(i))
         ]]
 
-    window = psg.Window("", layout)
+    window = psg.Window("", layout, return_keyboard_events = True)
 
     while True:
         event, values = window.read()
         # See if user wants to quit or window was closed
         if (event == psg.WINDOW_CLOSED) or (event == "Quit"):
             break
-        elif (event == "execute"):
+        elif ((event == "execute") or (event in [ "\r", "special 16777220", "special 16777221" ])):
             subset = []
             for card in table:
                 if ((values["name"].lower() in card["card_name"].lower()) and (values["text"].lower() in card["skill_disc"].lower())):
