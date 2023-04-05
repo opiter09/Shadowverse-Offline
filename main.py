@@ -71,7 +71,7 @@ if (result2 == "host"):
 address = psg.popup_get_text("Enter the host's IPv4 Address:")
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-serverAddress = ("localhost", address)
+serverAddress = (address, 10000)
 if (result2 == "host"):
     sock.bind(serverAddress)
             
