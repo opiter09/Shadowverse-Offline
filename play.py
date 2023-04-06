@@ -69,7 +69,7 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
                 connection.close()
                 print("Deck download failed!")
                 return(None)
-        # connection.close()
+        connection.close()
     elif (role == "client"):
         sockR.listen(1)
         packet = ""
@@ -82,7 +82,7 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
                 connection.close()
                 print("Deck download failed!")
                 return(None)
-        # connection.close()
+        connection.close()
         # print("client middle")
         while True:
             try:
@@ -99,11 +99,11 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
         first = int(packet.split("~~~")[2])
     # print(packetDeck[0]["card_name"])
     # print(deck[0]["card_name"])
-    return(deck, deckIndices, packetDeck, packetIndices, connection)
+    return(deck, deckIndices, packetDeck, packetIndices)
 
 def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive):
     # print(role)
-    yourDeckBase, yourDeck, theirDeckBase, theirDeck, connectR = deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive)
+    yourDeckBase, yourDeck, theirDeckBase, theirDeck = deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive)
     if (yourDeck == None):
         return
     
@@ -112,20 +112,26 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
     theirHand = theirDeck[0:3] + ([-1] * 6)
     theirDeck = theirDeck[3:]
     
-    layout = [[], [], [], [], []]
-    keyNames = [ "oppHand", "oppField", "yourField", "yourHand" ]
-    for i in range(4):
+    layout = [[], [], [], [], [], [], []]
+    keyNames = [ "oppHand", "oppDamage", "oppField", "yourField", "yourDamage", "yourHand" ]
+    for i in range(7):
         for j in range(9):
-            if ((i in [1, 2]) and (j in [0, 1, 7, 8])):
+            if ((i in [2, 3]) and (j in [0, 1, 7, 8])):
                 layout[i] = layout[i] + [ psg.Button("", key = keyNames[i] + str(j), size = (15, 3), disabled = True) ]
+            elif ((i in [1, 4]) and (j in [0, 1, 7, 8])):
+                layout[i] = layout[i] + [ psg.Button("", key = keyNames[i] + str(j), size = (15, 2), disabled = True) ]                
             else:
-                if ((i in [1, 2]) or ((i == 0) and (theirHand[j] == -1)) or ((i == 3) and (yourHand[j] == -1))):
+                if (i in [2, 3]):
                     layout[i] = layout[i] + [ psg.Button("BLANK", key = keyNames[i] + str(j), size = (15, 3), enable_events = True) ]
+                elif (((i == 0) and (theirHand[j] == -1)) or ((i == 5) and (yourHand[j] == -1))):
+                    layout[i] = layout[i] + [ psg.Button("BLANK", key = keyNames[i] + str(j), size = (15, 2), enable_events = True) ]
                 else:   
                     if (i == 0):
-                        layout[i] = layout[i] + [ psg.Button("UNKNOWN", key = keyNames[i] + str(j), size = (15, 3), enable_events = True) ]
-                    elif (i == 3):
-                        layout[i] = layout[i] + [ psg.Button(yourDeckBase[yourHand[j]]["card_name"], key = keyNames[i] + str(j), size = (15, 3),
+                        layout[i] = layout[i] + [ psg.Button("UNKNOWN", key = keyNames[i] + str(j), size = (15, 2), enable_events = True) ]
+                    elif (i in [1, 4]):
+                        layout[i] = layout[i] + [ psg.Button("0 Dmg / 0 Cnt", key = keyNames[i] + str(j), size = (15, 2), enable_events = True) ]
+                    elif (i == 5):
+                        layout[i] = layout[i] + [ psg.Button(yourDeckBase[yourHand[j]]["card_name"], key = keyNames[i] + str(j), size = (15, 2),
                                                     enable_events = True) ]
     global first
     trick = [ "host", "client" ]
@@ -136,9 +142,11 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         e = ["2", "3"]
     layout[0] = layout[0] + [ psg.Button("20 LIFE", key = "oppLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "oppPlay", size = (12, 1)) ]
     layout[1] = layout[1] + [ psg.Button(e[0] + " EVOLVE", key = "oppEvo", size = (12, 1)), psg.Button("4 TURNS", key = "oppTurns", size = (12, 1)) ]
-    layout[2] = layout[2] + [ psg.Button(e[1] + " EVOLVE", key = "yourEvo", size = (12, 1)), psg.Button("4 TURNS", key = "youtTurns", size = (12, 1)) ]
-    layout[3] = layout[3] + [ psg.Button("20 LIFE", key = "yourLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "yourPlay", size = (12, 1)) ]
-    layout[4] = [psg.Image("blank_card.png", key = "cardImage"), psg.Button("0 Class Counter", key = "classCounter", size = (20, 1))]
+    layout[2] = layout[2] + [ psg.Button("0 CLASS COUNTERS", key = "oppCounters", size = (12, 2)) ]
+    layout[3] = layout[3] + [ psg.Button("0 CLASS COUNTERS", key = "yourCounters", size = (12, 2)) ]
+    layout[4] = layout[4] + [ psg.Button(e[1] + " EVOLVE", key = "yourEvo", size = (12, 1)), psg.Button("4 TURNS", key = "yourTurns", size = (12, 1)) ]
+    layout[5] = layout[5] + [ psg.Button("20 LIFE", key = "yourLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "yourPlay", size = (12, 1)) ]
+    layout[6] = [ psg.Image("blank_card.png", key = "cardImage"), psg.Button("Send", key = "sendData"), psg.Button("Receive", key = "receiveData") ]
 
     window = psg.Window("", layout, grab_anywhere = True, resizable = True, auto_size_buttons = False)
     while True:
@@ -154,10 +162,6 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
             if (os.path.exists("results/" + window[event].get_text().replace(" ", "_") + "_base.png")):
                 window["cardImage"].update(filename = "results/" + window[event].get_text().replace(" ", "_") + "_base.png", visible = True)
                 window.refresh()
-            else:
-                window["cardImage"].update(filename = "blank_card.png")
-                window.refresh()
         except:
-            window["cardImage"].update(filename = "blank_card.png")
-            window.refresh()
+            pass
     window.close()
