@@ -35,7 +35,7 @@ def searchWindow(table):
             psg.Button("View Card", key = "view" + str(i))
         ]]
 
-    window = psg.Window("", layout, return_keyboard_events = True)
+    window = psg.Window("", layout, grab_anywhere = True, resizable = True, return_keyboard_events = True)
 
     while True:
         event, values = window.read()

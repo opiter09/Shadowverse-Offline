@@ -33,7 +33,7 @@ combine.createImages(realData)
 
 result = ""
 layout = [ [ psg.Text("Choose an application:") ], [ psg.Button("Search"), psg.Button("Play") ] ]
-window = psg.Window("", layout)
+window = psg.Window("", layout, grab_anywhere = True)
 while True:
     event, values = window.read()
     # See if user wants to quit or window was closed
@@ -53,7 +53,7 @@ if (result == "search"):
 
 result2 = ""
 layout = [ [ psg.Text("Choose a role:") ], [ psg.Button("Host"), psg.Button("Client") ] ]
-window = psg.Window("", layout)
+window = psg.Window("", layout, grab_anywhere = True)
 while True:
     event, values = window.read()
     # See if user wants to quit or window was closed
@@ -88,5 +88,5 @@ elif (result2 == "client"):
     theirReceive = (theirAddress, 10001)
 sockS.bind(yourSend)
 sockR.bind(yourReceive)
-            
+
 play.playBall(realData, result2, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive)
