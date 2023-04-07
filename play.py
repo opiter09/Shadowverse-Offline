@@ -4,6 +4,7 @@ import PySimpleGUI as psg
 import json
 import random
 import time
+import socket
 
 first = -1
 def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive):
@@ -21,6 +22,7 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
 
     bad = 0
     prev = "Neutral"
+    counts = {}
     for i in range(len(deck)):
         if (bad > 0):
             break
@@ -31,9 +33,13 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
                         bad = 1
                     else:
                         prev = card["clan"]
-                        deck[i] = card
+                        deck[i] = card["card_name"]
+                        if (counts.get(deck[i]) == None):
+                            counts[deck[i]] = 1
+                        else:
+                            counts[deck[i]] = counts[deck[i]] + 1
                     break
-        if (type(deck[i]) == str):
+        if (counts.get(deck[i]) == None):
             print(deck[i])
             bad = 2
     if (bad == 1):
@@ -42,9 +48,12 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
     elif (bad == 2):
         print("Invalid deck! Nonexistant cards detected!")
         return(None, None)
-    
-    deckIndices = list(range(40))
-    random.shuffle(deckIndices)
+    for val in counts.values():
+        if (val > 3):
+            print("Invalid deck! More than three copies of a card detected!")
+            return(None, None)
+
+    random.shuffle(deck)
     global first
 
     if (role == "host"):
@@ -52,7 +61,7 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
         while True:
             try:
                 sockS.connect(theirReceive)
-                sockS.sendall((json.dumps(deck) + "~~~" + json.dumps(deckIndices) + "~~~" + str(first)).encode("UTF-8"))
+                sockS.sendall((json.dumps(deck) + "~~~" + str(first)).encode("UTF-8"))
                 break
             except:
                 print("Deck upload failed!")
@@ -64,7 +73,7 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
             # Find connections
             connection, address = sockR.accept()
             try:
-                packet = connection.recv(262144).decode("UTF-8")
+                packet = connection.recv(65536).decode("UTF-8")
             except:
                 connection.close()
                 print("Deck download failed!")
@@ -77,7 +86,7 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
             # Find connections
             connection, address = sockR.accept()
             try:
-                packet = connection.recv(262144).decode("UTF-8")
+                packet = connection.recv(65536).decode("UTF-8")
             except:
                 connection.close()
                 print("Deck download failed!")
@@ -87,30 +96,67 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
         while True:
             try:
                 sockS.connect(theirReceive)
-                sockS.sendall((json.dumps(deck) + "~~~" + json.dumps(deckIndices)).encode("UTF-8"))
+                sockS.sendall((json.dumps(deck)).encode("UTF-8"))
                 break
             except:
                 print("Deck upload failed!")
                 return(None)
 
     packetDeck = json.loads(packet.split("~~~")[0])
-    packetIndices = json.loads(packet.split("~~~")[1])
     if (first == -1):
-        first = int(packet.split("~~~")[2])
+        first = int(packet.split("~~~")[1])
     # print(packetDeck[0]["card_name"])
     # print(deck[0]["card_name"])
-    return(deck, deckIndices, packetDeck, packetIndices)
+    return(deck, packetDeck)
 
 def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive):
     # print(role)
-    yourDeckBase, yourDeck, theirDeckBase, theirDeck = deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive)
-    if (yourDeck == None):
+    yourBaseDeck, theirBaseDeck = deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive)
+    if (yourBaseDeck == None):
         return
-    
-    yourHand = yourDeck[0:3] + ([-1] * 6)
-    yourDeck = yourDeck[3:]
-    theirHand = theirDeck[0:3] + ([-1] * 6)
-    theirDeck = theirDeck[3:]
+
+    global first
+    trick = [ "host", "client" ]
+    currentTurn = trick[first]
+    if (role == currentTurn):
+        e = ["3", "2"]
+    else:
+        e = ["2", "3"]
+        
+    transferState = {
+        "yourHand": yourBaseDeck[0:3] + (["BLANK"] * 6),
+        "yourDeck": yourBaseDeck[3:],
+        "yourGraveyard": [],
+        "yourBanishedZone": [],
+        "yourFusedZone": [],
+        "yourField": ["BLANK"] * 5,
+        "yourFieldEvo": [False] * 5,
+        "yourFieldDamage": [0, 0, 0, 0, 0],
+        "yourFieldCounters": [0, 0, 0, 0, 0],
+        "yourLife": 20,
+        "yourCurrentPlayPoints": 0,
+        "yourMaxPlayPoints": 0,
+        "yourCurrentEvoPoints": e[1],
+        "yourMaxEvoPoints": e[1],
+        "yourEvoWait": 4,
+        "yourCounters": 0,
+        "theirHand": theirBaseDeck[0:3] + (["BLANK"] * 6),
+        "theirDeck": theirBaseDeck[3:],
+        "theirGraveyard": [],
+        "theirBanishedZone": [],
+        "theirFusedZone": [],
+        "theirField": ["BLANK"] * 5,
+        "theirFieldEvo": [False] * 5,
+        "theirFieldDamage": [0, 0, 0, 0, 0],
+        "theirFieldCounters": [0, 0, 0, 0, 0],
+        "theirLife": 20,
+        "theirCurrentPlayPoints": 0,
+        "theirMaxPlayPoints": 0,
+        "theirCurrentEvoPoints": e[0],
+        "theirMaxEvoPoints": e[0],
+        "theirEvoWait": 4,
+        "theirCounters": 0
+    }
     
     layout = [[], [], [], [], [], [], []]
     keyNames = [ "oppHand", "oppDamage", "oppField", "yourField", "yourDamage", "yourHand" ]
@@ -123,7 +169,7 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
             else:
                 if (i in [2, 3]):
                     layout[i] = layout[i] + [ psg.Button("BLANK", key = keyNames[i] + str(j), size = (15, 3), enable_events = True) ]
-                elif (((i == 0) and (theirHand[j] == -1)) or ((i == 5) and (yourHand[j] == -1))):
+                elif (((i == 0) and (transferState["theirHand"][j] == "BLANK")) or ((i == 5) and (transferState["yourHand"][j] == "BLANK"))):
                     layout[i] = layout[i] + [ psg.Button("BLANK", key = keyNames[i] + str(j), size = (15, 2), enable_events = True) ]
                 else:   
                     if (i == 0):
@@ -131,20 +177,16 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
                     elif (i in [1, 4]):
                         layout[i] = layout[i] + [ psg.Button("0 Dmg / 0 Cnt", key = keyNames[i] + str(j), size = (15, 2), enable_events = True) ]
                     elif (i == 5):
-                        layout[i] = layout[i] + [ psg.Button(yourDeckBase[yourHand[j]]["card_name"], key = keyNames[i] + str(j), size = (15, 2),
+                        layout[i] = layout[i] + [ psg.Button(transferState["yourHand"][j], key = keyNames[i] + str(j), size = (15, 2),
                                                     enable_events = True) ]
-    global first
-    trick = [ "host", "client" ]
-    currentTurn = trick[first]
-    if (role == currentTurn):
-        e = ["3", "2"]
-    else:
-        e = ["2", "3"]
+
     layout[0] = layout[0] + [ psg.Button("20 LIFE", key = "oppLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "oppPlay", size = (12, 1)) ]
-    layout[1] = layout[1] + [ psg.Button(e[0] + " EVOLVE", key = "oppEvo", size = (12, 1)), psg.Button("4 TURNS", key = "oppTurns", size = (12, 1)) ]
+    layout[1] = layout[1] + [ psg.Button(e[0] + " / " + e[0] + " EVOLVE", key = "oppEvo", size = (12, 1)),
+                                psg.Button("4 TURNS", key = "oppTurns", size = (12, 1)) ]
     layout[2] = layout[2] + [ psg.Button("0 CLASS COUNTERS", key = "oppCounters", size = (12, 2)) ]
     layout[3] = layout[3] + [ psg.Button("0 CLASS COUNTERS", key = "yourCounters", size = (12, 2)) ]
-    layout[4] = layout[4] + [ psg.Button(e[1] + " EVOLVE", key = "yourEvo", size = (12, 1)), psg.Button("4 TURNS", key = "yourTurns", size = (12, 1)) ]
+    layout[4] = layout[4] + [ psg.Button(e[1] + " / " + e[1] + " EVOLVE", key = "yourEvo", size = (12, 1)),
+                                psg.Button("4 TURNS", key = "yourTurns", size = (12, 1)) ]
     layout[5] = layout[5] + [ psg.Button("20 LIFE", key = "yourLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "yourPlay", size = (12, 1)) ]
     layout[6] = [ psg.Image("blank_card.png", key = "cardImage"), psg.Button("Send", key = "sendData"), psg.Button("Receive", key = "receiveData") ]
 
@@ -153,15 +195,42 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         event, values = window.read()
         # See if user wants to quit or window was closed
         if (event == psg.WINDOW_CLOSED) or (event == "Quit"):
-            connectR.close()
             sockS.close()
             sockR.close()
             break
 
         try:
             if (os.path.exists("results/" + window[event].get_text().replace(" ", "_") + "_base.png")):
-                window["cardImage"].update(filename = "results/" + window[event].get_text().replace(" ", "_") + "_base.png", visible = True)
+                window["cardImage"].update(filename = "results/" + window[event].get_text().replace(" ", "_") + "_base.png")
                 window.refresh()
+            elif (os.path.exists("results/" + window[event].get_text().split(" EVOLVED")[0].replace(" ", "_") + "_evolved.png")):
+                window["cardImage"].update(filename = "results/" + window[event].get_text().split(" EVOLVED")[0].replace(" ", "_") + "_evolved.png")
+                window.refresh()            
         except:
             pass
+
+        if (event == "sendData"):
+            while True:
+                try:
+                    # sockS.connect(theirReceive)
+                    sockS.sendall((json.dumps(transferState).encode("UTF-8")))
+                    break
+                except:
+                    psg.popup("Data transfer failed!")
+                    break
+        elif (event == "receiveData"):
+            sockR.listen(1)
+            packet = ""
+            while (packet == ""):
+                connection, address = sockR.accept()
+                # try:
+                packet = connection.recv(65536).decode("UTF-8")
+                # except:
+                    # connection.close()
+                    # psg.popup("Data transfer failed!")
+                    # break
+            connection.close()
+            if (packet != ""):
+                transferState = json.loads(packet)
+
     window.close()
