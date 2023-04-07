@@ -123,8 +123,8 @@ def updateButtons(window, transferState, keyNames):
                     if (i == 0):
                         window[keyNames[i] + str(j)].update(text = "UNKNOWN")
                     elif (i in [1, 4]):
-                        window[keyNames[i] + str(j)].update(text = str(transferState[keyNames[i].split("D")[0] + "FieldDamage"][j - 2]) + " Dmg / " + 
-                                                                str(transferState[keyNames[i].split("D")[0] + "FieldCounters"][j - 2]) + " Cnt")
+                        window[keyNames[i] + str(j)].update(text = str(transferState[keyNames[i].split("D")[0] + "FieldDamage"][j - 2]) + " Dmg / " \
+                                                                + str(transferState[keyNames[i].split("D")[0] + "FieldCounters"][j - 2]) + " Cnt")
                     elif (i == 5):
                         window[keyNames[i] + str(j)].update(text = transferState["yourHand"][j])
     for s in [ "your", "their" ]:
