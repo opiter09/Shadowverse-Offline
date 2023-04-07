@@ -90,6 +90,3 @@ sockS.bind(yourSend)
 sockR.bind(yourReceive)
 
 play.playBall(realData, result2, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive)
-
-sockS.close()
-sockR.close()

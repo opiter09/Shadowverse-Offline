@@ -56,7 +56,7 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
     random.shuffle(deck)
     global first
 
-    if (role == "host"):
+    if (role == "client"):
         first = int(time.time()) % 2
         while True:
             try:
@@ -67,7 +67,7 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
                 print("Deck upload failed!")
                 return(None)
         # print("host middle")
-        sockR.listen(1)
+        sockR.listen()
         packet = ""
         while (packet == ""):
             # Find connections
@@ -78,9 +78,9 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
                 connection.close()
                 print("Deck download failed!")
                 return(None)
-        connection.close()
-    elif (role == "client"):
-        sockR.listen(1)
+        # connection.close()
+    elif (role == "host"):
+        sockR.listen()
         packet = ""
         while (packet == ""):
             # Find connections
@@ -91,7 +91,7 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
                 connection.close()
                 print("Deck download failed!")
                 return(None)
-        connection.close()
+        # connection.close()
         # print("client middle")
         while True:
             try:
@@ -107,23 +107,51 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
         first = int(packet.split("~~~")[1])
     # print(packetDeck[0]["card_name"])
     # print(deck[0]["card_name"])
-    return(deck, packetDeck)
+    return(deck, packetDeck, connection)
+
+def updateButtons(window, transferState, keyNames):
+    for i in range(7):
+        for j in range(9):
+            if ((i in [1, 2, 3, 4]) and (j in [0, 1, 7, 8])):
+                continue              
+            else:
+                if (i in [2, 3]):
+                    window[keyNames[i] + str(j)].update(text = transferState[keyNames[i]][j - 2])
+                elif (((i == 0) and (transferState["theirHand"][j] == "BLANK")) or ((i == 5) and (transferState["yourHand"][j] == "BLANK"))):
+                    window[keyNames[i] + str(j)].update(text = "BLANK")
+                else:   
+                    if (i == 0):
+                        window[keyNames[i] + str(j)].update(text = "UNKNOWN")
+                    elif (i in [1, 4]):
+                        window[keyNames[i] + str(j)].update(text = str(transferState[keyNames[i].split("D")[0] + "FieldDamage"][j - 2]) + " Dmg / " + 
+                                                                str(transferState[keyNames[i].split("D")[0] + "FieldCounters"][j - 2]) + " Cnt")
+                    elif (i == 5):
+                        window[keyNames[i] + str(j)].update(text = transferState["yourHand"][j])
+    for s in [ "your", "their" ]:
+        window[s + "Life"].update(text = str(transferState[s + "Life"]) + " LIFE")
+        window[s + "Play"].update(text = str(transferState[s + "CurrentPlayPoints"]) + " / " + str(transferState[s + "MaxPlayPoints"]) + " PLAY")
+        window[s + "Evo"].update(text = str(transferState[s + "CurrentEvoPoints"]) + " / " + str(transferState[s + "MaxEvoPoints"]) + " EVOLVE")
+        window[s + "Turns"].update(text = str(transferState[s + "EvoWait"]) + " TURNS")
+        window[s + "Counters"].update(text = str(transferState[s + "ClassCounters"]) + " COUNTERS")
 
 def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive):
     # print(role)
-    yourBaseDeck, theirBaseDeck = deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive)
+    yourBaseDeck, theirBaseDeck, connectR = deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive)
     if (yourBaseDeck == None):
+        connectR.close()
+        sockR.close()
+        sockS.close()
         return
 
     global first
     trick = [ "host", "client" ]
-    currentTurn = trick[first]
-    if (role == currentTurn):
+    if (role == trick[first]):
         e = ["3", "2"]
     else:
         e = ["2", "3"]
         
     transferState = {
+        "currentTurn": trick[first],
         "yourHand": yourBaseDeck[0:3] + (["BLANK"] * 6),
         "yourDeck": yourBaseDeck[3:],
         "yourGraveyard": [],
@@ -139,7 +167,7 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         "yourCurrentEvoPoints": e[1],
         "yourMaxEvoPoints": e[1],
         "yourEvoWait": 4,
-        "yourCounters": 0,
+        "yourClassCounters": 0,
         "theirHand": theirBaseDeck[0:3] + (["BLANK"] * 6),
         "theirDeck": theirBaseDeck[3:],
         "theirGraveyard": [],
@@ -155,17 +183,15 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         "theirCurrentEvoPoints": e[0],
         "theirMaxEvoPoints": e[0],
         "theirEvoWait": 4,
-        "theirCounters": 0
+        "theirClassCounters": 0
     }
     
     layout = [[], [], [], [], [], [], []]
-    keyNames = [ "oppHand", "oppDamage", "oppField", "yourField", "yourDamage", "yourHand" ]
+    keyNames = [ "theirHand", "theirDamage", "theirField", "yourField", "yourDamage", "yourHand" ]
     for i in range(7):
         for j in range(9):
-            if ((i in [2, 3]) and (j in [0, 1, 7, 8])):
-                layout[i] = layout[i] + [ psg.Button("", key = keyNames[i] + str(j), size = (15, 3), disabled = True) ]
-            elif ((i in [1, 4]) and (j in [0, 1, 7, 8])):
-                layout[i] = layout[i] + [ psg.Button("", key = keyNames[i] + str(j), size = (15, 2), disabled = True) ]                
+            if ((i in [1, 2, 3, 4]) and (j in [0, 1, 7, 8])):
+                layout[i] = layout[i] + [ psg.Button("", key = keyNames[i] + str(j), size = (15, 3), disabled = True) ]               
             else:
                 if (i in [2, 3]):
                     layout[i] = layout[i] + [ psg.Button("BLANK", key = keyNames[i] + str(j), size = (15, 3), enable_events = True) ]
@@ -180,11 +206,11 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
                         layout[i] = layout[i] + [ psg.Button(transferState["yourHand"][j], key = keyNames[i] + str(j), size = (15, 2),
                                                     enable_events = True) ]
 
-    layout[0] = layout[0] + [ psg.Button("20 LIFE", key = "oppLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "oppPlay", size = (12, 1)) ]
-    layout[1] = layout[1] + [ psg.Button(e[0] + " / " + e[0] + " EVOLVE", key = "oppEvo", size = (12, 1)),
-                                psg.Button("4 TURNS", key = "oppTurns", size = (12, 1)) ]
-    layout[2] = layout[2] + [ psg.Button("0 CLASS COUNTERS", key = "oppCounters", size = (12, 2)) ]
-    layout[3] = layout[3] + [ psg.Button("0 CLASS COUNTERS", key = "yourCounters", size = (12, 2)) ]
+    layout[0] = layout[0] + [ psg.Button("20 LIFE", key = "theirLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "theirPlay", size = (12, 1)) ]
+    layout[1] = layout[1] + [ psg.Button(e[0] + " / " + e[0] + " EVOLVE", key = "theirEvo", size = (12, 1)),
+                                psg.Button("4 TURNS", key = "theirTurns", size = (12, 1)) ]
+    layout[2] = layout[2] + [ psg.Button("0 COUNTERS", key = "theirCounters", size = (12, 2)) ]
+    layout[3] = layout[3] + [ psg.Button("0 COUNTERS", key = "yourCounters", size = (12, 2)) ]
     layout[4] = layout[4] + [ psg.Button(e[1] + " / " + e[1] + " EVOLVE", key = "yourEvo", size = (12, 1)),
                                 psg.Button("4 TURNS", key = "yourTurns", size = (12, 1)) ]
     layout[5] = layout[5] + [ psg.Button("20 LIFE", key = "yourLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "yourPlay", size = (12, 1)) ]
@@ -195,6 +221,7 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         event, values = window.read()
         # See if user wants to quit or window was closed
         if (event == psg.WINDOW_CLOSED) or (event == "Quit"):
+            connectR.close()
             sockS.close()
             sockR.close()
             break
@@ -212,25 +239,25 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         if (event == "sendData"):
             while True:
                 try:
-                    # sockS.connect(theirReceive)
                     sockS.sendall((json.dumps(transferState).encode("UTF-8")))
                     break
                 except:
                     psg.popup("Data transfer failed!")
                     break
         elif (event == "receiveData"):
-            sockR.listen(1)
             packet = ""
             while (packet == ""):
-                connection, address = sockR.accept()
-                # try:
-                packet = connection.recv(65536).decode("UTF-8")
-                # except:
-                    # connection.close()
-                    # psg.popup("Data transfer failed!")
-                    # break
-            connection.close()
+                try:
+                    packet = connectR.recv(65536).decode("UTF-8")
+                except:
+                    psg.popup("Data transfer failed!")
+                    break
             if (packet != ""):
-                transferState = json.loads(packet)
+                transferState = json.loads(packet.replace("\"your", "xkcdxkcd").replace("\"their", "\"your").replace("xkcdxkcd", "\"their"))
+                
+            updateButtons(window, transferState, keyNames)
 
     window.close()
+    connectR.close()
+    sockR.close()
+    sockS.close()

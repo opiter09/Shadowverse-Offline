@@ -4,7 +4,7 @@ it's nothing like the actual game. And the WIP game engine will have very little
 Oh and I sure as hell am not learning actual Internet code, so this will be made using cobbled-together LAN programming. But at least the search doesn't require you to go through
 all the app's menus, and you will be able to play with any card that exists in the game as of March 2023 (or beyond if you are willing to supply your own json).
 
-THE CLIENT NEEDS TO START (AND GO THROUGH ALL THREE MENUS) BEFORE THE HOST!!!
+THE HOST NEEDS TO START (AND GO THROUGH ALL THREE MENUS) BEFORE THE CLIENT!!!
 
 # Note
 This program is designed to run on Windows. Normally, the whole Python thing would make it quite portable, but there are a few things Stack Overflow tells me work a little differently

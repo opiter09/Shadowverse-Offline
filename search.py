@@ -7,13 +7,13 @@ def searchWindow(table):
     classes = [ "Neutral", "Forestcraft", "Swordcraft", "Runecraft", "Dragoncraft", "Shadowcraft", "Bloodcraft", "Havencraft", "Portalcraft" ]
     types = [ "None", "Follower", "Amulet", "AmuletC", "Spell" ]
     pages = [ "Page 1", "Page 2", "Page 3", "Page 4", "Page 5", "Page 6", "Page 7", "Page 8", "Page 9", "Page 10" ]
-    layout = [
+    subLay = [
         [ psg.Text("Name:"), psg.Input(key = "name", enable_events = True, default_text = "") ],
-        [ psg.Text("  Text:"), psg.Input(key = "text", enable_events = True, default_text = "") ],
+        [ psg.Text("   Text:"), psg.Input(key = "text", enable_events = True, default_text = "") ],
         [ psg.Text("Rarity:"), psg.DropDown(["Any"] + rarities, key = "rarity", default_value = "Any") ],
         [ psg.Text("Class:"), psg.DropDown(["Any"] + classes, key = "class", default_value = "Any") ],
-        [ psg.Text(" Type:"), psg.DropDown(["Any"] + types, key = "type", default_value = "Any") ],
-        [ psg.Text(" Trait:"), psg.Input(key = "subtype", enable_events = True, default_text = "") ],
+        [ psg.Text("  Type:"), psg.DropDown(["Any"] + types, key = "type", default_value = "Any") ],
+        [ psg.Text("  Trait:"), psg.Input(key = "subtype", enable_events = True, default_text = "") ],
         [ 
             psg.Text(" Min Cost:"), psg.DropDown([str(x) for x in ["Any"] + list(range(11))], key = "minCost", default_value = "Any"),
             psg.Text(" Min Attack:"), psg.DropDown([str(x) for x in ["Any"] + list(range(21))], key = "minAttack", default_value = "Any"),
@@ -24,18 +24,18 @@ def searchWindow(table):
             psg.Text("Max Attack:"), psg.DropDown([str(x) for x in ["Any"] + list(range(21))], key = "maxAttack", default_value = "Any"),
             psg.Text("Max Life:"), psg.DropDown([str(x) for x in ["Any"] + list(range(21))], key = "maxLife", default_value = "Any")
         ],
-        [ psg.Text(" " * 59), psg.DropDown(pages, key = "page", default_value = "Page 1"), psg.Button("Search", key = "execute") ]
+        [ psg.Text("", size = (29, 1)), psg.DropDown(pages, key = "page", default_value = "Page 1"), psg.Button("Search", key = "execute") ]
     ]
     textList = [""] * 10
     for i in range(10):
         textList[i] = "Card " + str(i)
-        layout = layout + [[
-            psg.Text("Card " + str(i), key = "cardText" + str(i)),
+        subLay = subLay + [[
+            psg.Text("Card " + str(i), key = "cardText" + str(i), size = (32, 1)),
             psg.DropDown([ "Base", "Evo" ], key = "evolved" + str(i), default_value = "Base"),
             psg.Button("View Card", key = "view" + str(i))
         ]]
-
-    window = psg.Window("", layout, grab_anywhere = True, resizable = True, return_keyboard_events = True)
+    layout = [[ psg.Column(subLay), psg.Column([[psg.Image("blank_card.png", key = "cardImage")]]) ]]
+    window = psg.Window("", layout, grab_anywhere = True, resizable = True, return_keyboard_events = True, font = 20)
 
     while True:
         event, values = window.read()
@@ -71,9 +71,9 @@ def searchWindow(table):
             if (event == "view" + str(i)):
                 if (textList[i] != "Card " + str(i)):
                     if ((values["evolved" + str(i)] == "Evo") and (os.path.exists("./results/" + textList[i].replace(" ", "_") + "_evolved.png"))):
-                        os.startfile(".\\results\\" + textList[i].replace(" ", "_") + "_evolved.png")
+                        window["cardImage"].update(filename = "./results/" + textList[i].replace(" ", "_") + "_evolved.png")
                     else:
-                        os.startfile(".\\results\\" + textList[i].replace(" ", "_") + "_base.png")          
+                        window["cardImage"].update(filename = "./results/" + textList[i].replace(" ", "_") + "_base.png")       
             
     # Finish up by removing from the screen
     window.close()
