@@ -9,8 +9,7 @@ THE HOST NEEDS TO START (AND GO THROUGH ALL THREE MENUS) BEFORE THE CLIENT!!!
 # Note
 This program is designed to run on Windows. Normally, the whole Python thing would make it quite portable, but there are a few things Stack Overflow tells me work a little differently
 on other platforms. Here is a list of differences I have found:
-- os.startfile(filename) in search.py needs to be replaced with subprocess.call(("xdg-open", filepath))
-- subprocess.Popen(["ipconfig"]) in main.py needs to be replaced with subprocess.Popen(["ifconfig"]) (or some equivalent function that runs "ifconfig," if needed)
+- subprocess.Popen(["ipconfig"]) in main.py needs to be replaced with subprocess.Popen(["ifconfig"]) on Linux, or...something on Mac
 
 # Credits
 - Thanks to PySimpleGUI, for making it very easy for me to make GUIs for this stuff
