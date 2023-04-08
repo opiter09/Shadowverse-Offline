@@ -139,9 +139,18 @@ def updateButtons(window, transferState, keyNames):
 
 def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive):
     # print(role)
-    yourBaseDeck, theirBaseDeck, connectR = deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive)
-    if (yourBaseDeck == None):
-        connectR.close()
+    try:
+        yourBaseDeck, theirBaseDeck, connectR = deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive)
+        if (yourBaseDeck == None):
+            connectR.close()
+            sockR.close()
+            sockS.close()
+            return
+    except:
+        try:
+            connectR.close()
+        except:
+            pass
         sockR.close()
         sockS.close()
         return
@@ -226,7 +235,15 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
     layout[5] = layout[5] + [ psg.Button("20 LIFE", key = "yourLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "yourPlay", size = (12, 1)) ]
     
     subLay = [
-        [ psg.Button("Receive", key = "receiveData"), psg.Button("Send", key = "sendData"), psg.Button("End Turn", key = "endTurn") ]
+        [ psg.Button("Receive", key = "receiveData"), psg.Button("Send", key = "sendData"), psg.Button("End Turn", key = "endTurn") ],
+        [ psg.Text("Left/Only Value:"), psg.DropDown(["Nothing", "Increase", "Decrease"], key = "leftChange", default_value = "Nothing"),
+            psg.Text("Right Value:"), psg.DropDown(["Nothing", "Increase", "Decrease"], key = "rightChange", default_value = "Nothing") ],
+        [ psg.Text("  Move Card To:"), psg.DropDown(["Your", "Their"], key = "whoseZone", default_value = "Your"),
+            psg.DropDown([ "Nowhere", "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Nowhere") ],
+        [ psg.Button("View Graveyard", key = "viewGrave", size = (12, 1)), psg.Button("View Banish", key = "viewBanish"),
+            psg.Button("Draw Card", key = "drawCard") ],
+        [ psg.Text("Randomly:"), psg.DropDown(["Nothing"], key = "random", default_value = "Nothing"),
+            psg.DropDown([str(x + 1) for x in list(range(20))], default_value = "1"), psg.Button("Do It", key = "rollDice") ]
     ]
     layout[6] = [
         psg.Column([[psg.Image("blank_card.png", key = "yourCardImage")]]),
