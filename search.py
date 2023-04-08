@@ -30,11 +30,14 @@ def searchWindow(table):
     for i in range(10):
         textList[i] = "Card " + str(i)
         subLay = subLay + [[
-            psg.Text("Card " + str(i), key = "cardText" + str(i), size = (32, 1)),
-            psg.DropDown([ "Base", "Evo" ], key = "evolved" + str(i), default_value = "Base"),
+            psg.Text("Card " + str(i + 1), key = "cardText" + str(i), size = (29, 1)),
             psg.Button("View Card", key = "view" + str(i))
         ]]
-    layout = [[ psg.Column(subLay), psg.Column([[psg.Image("blank_card.png", key = "cardImage")]]) ]]
+    layout = [
+        [
+            psg.Column(subLay), psg.Column([[psg.Image("blank_card.png", key = "cardImage"), psg.Image("blank_card.png", key = "cardImageEvo")]])
+        ]
+    ]
     window = psg.Window("", layout, grab_anywhere = True, resizable = True, return_keyboard_events = True, font = 20)
 
     while True:
@@ -64,16 +67,18 @@ def searchWindow(table):
                     window["cardText" + str(i)].update(subset[curr]["card_name"])
                     textList[i] = subset[curr]["card_name"]
                 else:
-                    window["cardText" + str(i)].update("Card " + str(i))
+                    window["cardText" + str(i)].update("Card " + str(i + 1))
                     textList[i] = "Card " + str(i)
                                  
         for i in range(10):
             if (event == "view" + str(i)):
                 if (textList[i] != "Card " + str(i)):
-                    if ((values["evolved" + str(i)] == "Evo") and (os.path.exists("./results/" + textList[i].replace(" ", "_") + "_evolved.png"))):
-                        window["cardImage"].update(filename = "./results/" + textList[i].replace(" ", "_") + "_evolved.png")
+                    if (os.path.exists("./results/" + textList[i].replace(" ", "_") + "_evolved.png")):
+                        window["cardImage"].update(filename = "./results/" + textList[i].replace(" ", "_") + "_base.png")
+                        window["cardImageEvo"].update(filename = "./results/" + textList[i].replace(" ", "_") + "_evolved.png")
                     else:
-                        window["cardImage"].update(filename = "./results/" + textList[i].replace(" ", "_") + "_base.png")       
+                        window["cardImage"].update(filename = "./results/" + textList[i].replace(" ", "_") + "_base.png")  
+                        window["cardImageEvo"].update(filename = "blank_card.png")                        
             
     # Finish up by removing from the screen
     window.close()

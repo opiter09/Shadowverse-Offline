@@ -98,7 +98,7 @@ def createImages(table):
             else:
                 temp = temp + line + (" " * 28)
 
-        im = Image.new("RGBA", size = (336, 464), color = (255, 255, 255)) # 28 x 39
+        im = Image.new("RGBA", size = (336, 468), color = (255, 255, 255)) # 28 x 39
         count = -1
         for ch in temp:
             count = count + 1
