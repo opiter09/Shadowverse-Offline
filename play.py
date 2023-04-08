@@ -67,7 +67,7 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
                 print("Deck upload failed!")
                 return(None)
         # print("host middle")
-        sockR.listen()
+        sockR.listen(1)
         packet = ""
         while (packet == ""):
             # Find connections
@@ -80,7 +80,7 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
                 return(None)
         # connection.close()
     elif (role == "host"):
-        sockR.listen()
+        sockR.listen(1)
         packet = ""
         while (packet == ""):
             # Find connections
@@ -224,7 +224,15 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
     layout[4] = layout[4] + [ psg.Button(e[1] + " / " + e[1] + " EVOLVE", key = "yourEvo", size = (12, 1)),
                                 psg.Button("4 TURNS", key = "yourTurns", size = (12, 1)) ]
     layout[5] = layout[5] + [ psg.Button("20 LIFE", key = "yourLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "yourPlay", size = (12, 1)) ]
-    layout[6] = [ psg.Image("blank_card.png", key = "cardImage"), psg.Button("Send", key = "sendData"), psg.Button("Receive", key = "receiveData") ]
+    
+    subLay = [
+        [ psg.Button("Receive", key = "receiveData"), psg.Button("Send", key = "sendData"), psg.Button("End Turn", key = "endTurn") ]
+    ]
+    layout[6] = [
+        psg.Column([[psg.Image("blank_card.png", key = "yourCardImage")]]),
+        psg.Column(subLay),
+        psg.Column([[psg.Image("blank_card.png", key = "theiCardImage")]]),
+    ]
 
     window = psg.Window("", layout, grab_anywhere = True, resizable = True, auto_size_buttons = False)
     while True:
@@ -237,12 +245,13 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
             break
 
         try:
-            if (os.path.exists("results/" + window[event].get_text().replace(" ", "_") + "_base.png")):
-                window["cardImage"].update(filename = "results/" + window[event].get_text().replace(" ", "_") + "_base.png")
+            longName = "results/" + window[event].get_text().replace(" ", "_")
+            if (os.path.exists(longName + "_base.png")):
+                window[event[0:4] + "CardImage"].update(filename = longName + "_base.png")
                 window.refresh()
-            elif (os.path.exists("results/" + window[event].get_text().split(" EVOLVED")[0].replace(" ", "_") + "_evolved.png")):
-                window["cardImage"].update(filename = "results/" + window[event].get_text().split(" EVOLVED")[0].replace(" ", "_") + "_evolved.png")
-                window.refresh()            
+                if ((longName.endswith("EVOLVED") == True) and (os.path.exists(longName.split("_EVOLVED")[0] + "_evolved.png"))):
+                    window[event[0:4] + "CardImage"].update(filename = longName.split("_EVOLVED")[0].replace(" ", "_") + "_evolved.png")
+                    window.refresh()            
         except:
             pass
 
@@ -265,6 +274,8 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
             if (packet != ""):
                 transferState = json.loads(packet.replace("\"your", "xkcdxkcd").replace("\"their", "\"your").replace("xkcdxkcd", "\"their"))   
                 updateButtons(window, transferState, keyNames)
+        elif (event == "endTurn"):
+            transferState["currentTurn"] = trick[int(not trick.index(transferState["currentTurn"]))]
 
     window.close()
     connectR.close()
