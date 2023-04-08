@@ -121,7 +121,10 @@ def updateButtons(window, transferState, keyNames):
                     window[keyNames[i] + str(j)].update(text = "BLANK")
                 else:   
                     if (i == 0):
-                        window[keyNames[i] + str(j)].update(text = "UNKNOWN")
+                        if (transferState["theirHandRevealed"][j] == False):
+                            window[keyNames[i] + str(j)].update(text = "UNKNOWN")
+                        else:
+                            window[keyNames[i] + str(j)].update(text = transferState["theirHand"][j])
                     elif (i in [1, 4]):
                         window[keyNames[i] + str(j)].update(text = str(transferState[keyNames[i].split("D")[0] + "FieldDamage"][j - 2]) + " Dmg / " \
                                                                 + str(transferState[keyNames[i].split("D")[0] + "FieldCounters"][j - 2]) + " Cnt")
@@ -153,6 +156,7 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
     transferState = {
         "currentTurn": trick[first],
         "yourHand": yourBaseDeck[0:3] + (["BLANK"] * 6),
+        "yourHandRevealed": [False] * 9,
         "yourDeck": yourBaseDeck[3:],
         "yourGraveyard": [],
         "yourBanishedZone": [],
@@ -169,6 +173,7 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         "yourEvoWait": 4,
         "yourClassCounters": 0,
         "theirHand": theirBaseDeck[0:3] + (["BLANK"] * 6),
+        "theirHandRevealed": [False] * 9,
         "theirDeck": theirBaseDeck[3:],
         "theirGraveyard": [],
         "theirBanishedZone": [],
@@ -191,7 +196,10 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
     for i in range(7):
         for j in range(9):
             if ((i in [1, 2, 3, 4]) and (j in [0, 1, 7, 8])):
-                layout[i] = layout[i] + [ psg.Button("", key = keyNames[i] + str(j), size = (15, 3), disabled = True) ]               
+                if (i in [1, 4]):
+                    layout[i] = layout[i] + [ psg.Button("", key = keyNames[i] + str(j), size = (15, 2), disabled = True) ]
+                else:
+                    layout[i] = layout[i] + [ psg.Button("", key = keyNames[i] + str(j), size = (15, 3), disabled = True) ]
             else:
                 if (i in [2, 3]):
                     layout[i] = layout[i] + [ psg.Button("BLANK", key = keyNames[i] + str(j), size = (15, 3), enable_events = True) ]
@@ -209,8 +217,10 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
     layout[0] = layout[0] + [ psg.Button("20 LIFE", key = "theirLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "theirPlay", size = (12, 1)) ]
     layout[1] = layout[1] + [ psg.Button(e[0] + " / " + e[0] + " EVOLVE", key = "theirEvo", size = (12, 1)),
                                 psg.Button("4 TURNS", key = "theirTurns", size = (12, 1)) ]
-    layout[2] = layout[2] + [ psg.Button("0 COUNTERS", key = "theirCounters", size = (12, 2)) ]
-    layout[3] = layout[3] + [ psg.Button("0 COUNTERS", key = "yourCounters", size = (12, 2)) ]
+    layout[2] = layout[2] + [ psg.Button("0 COUNTERS", key = "theirCounters", size = (12, 2)),
+                                psg.Button("X TIMES", key = "theirOccurances", size = (12, 2)) ]
+    layout[3] = layout[3] + [ psg.Button("0 COUNTERS", key = "yourCounters", size = (12, 2)),
+                                psg.Button("0 TIMES", key = "yourOccurances", size = (12, 2)) ]
     layout[4] = layout[4] + [ psg.Button(e[1] + " / " + e[1] + " EVOLVE", key = "yourEvo", size = (12, 1)),
                                 psg.Button("4 TURNS", key = "yourTurns", size = (12, 1)) ]
     layout[5] = layout[5] + [ psg.Button("20 LIFE", key = "yourLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "yourPlay", size = (12, 1)) ]
@@ -253,9 +263,8 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
                     psg.popup("Data transfer failed!")
                     break
             if (packet != ""):
-                transferState = json.loads(packet.replace("\"your", "xkcdxkcd").replace("\"their", "\"your").replace("xkcdxkcd", "\"their"))
-                
-            updateButtons(window, transferState, keyNames)
+                transferState = json.loads(packet.replace("\"your", "xkcdxkcd").replace("\"their", "\"your").replace("xkcdxkcd", "\"their"))   
+                updateButtons(window, transferState, keyNames)
 
     window.close()
     connectR.close()
