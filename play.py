@@ -236,9 +236,12 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
     
     subLay = [
         [ psg.Button("Receive", key = "receiveData"), psg.Button("Send", key = "sendData"), psg.Button("End Turn", key = "endTurn") ],
-        [ psg.Text("Left/Only Value:"), psg.DropDown(["Nothing", "Increase", "Decrease"], key = "leftChange", default_value = "Nothing"),
-            psg.Text("Right Value:"), psg.DropDown(["Nothing", "Increase", "Decrease"], key = "rightChange", default_value = "Nothing") ],
-        [ psg.Text("Move Card To:  "), psg.DropDown(["Your", "Their"], key = "whoseZone", default_value = "Your"),
+        [ psg.Text("Choose To:"), psg.DropDown(["Nothing", "Reveal", "Unreveal"], key = "revealChoice", default_value = "Nothing"),
+            psg.Text("From Your Hand, Or To:"), psg.DropDown(["Nothing", "Evolve", "Unevolve"], key = "evolveChoice", default_value = "Nothing"),
+            psg.Text("On Your Field") ],
+        [ psg.DropDown(["Nothing", "Increase", "Decrease"], key = "numChange", default_value = "Nothing"), psg.Text("The:"),
+            psg.DropDown(["Left/Only Value", "Right Value"], key = "sideSelect", default_value = "Left/Only Value:") ],
+        [ psg.Text("Move Card To:"), psg.DropDown(["Your", "Their"], key = "whoseZone", default_value = "Your"),
             psg.DropDown([ "Nowhere", "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Nowhere", key = "moveLoc") ],
         [ psg.Text("Add"), psg.Input(key = "createCard"), psg.Text("To Your:"),
             psg.DropDown([ "Nowhere", "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Nowhere", key = "addLoc"),
