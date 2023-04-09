@@ -216,7 +216,7 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
                     layout[i] = layout[i] + [ psg.Button("BLANK", key = keyNames[i] + str(j), size = (15, 2), enable_events = True) ]
                 else:   
                     if (i == 0):
-                        layout[i] = layout[i] + [ psg.Button("UNKNOWN", key = keyNames[i] + str(j), size = (15, 2), enable_events = True) ]
+                        layout[i] = layout[i] + [ psg.Button("UNKOWN", key = keyNames[i] + str(j), size = (15, 2), enable_events = True) ]
                     elif (i in [1, 4]):
                         layout[i] = layout[i] + [ psg.Button("0 Dmg / 0 Cnt", key = keyNames[i] + str(j), size = (15, 2), enable_events = True) ]
                     elif (i == 5):
@@ -235,12 +235,13 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
     layout[5] = layout[5] + [ psg.Button("20 LIFE", key = "yourLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "yourPlay", size = (12, 1)) ]
     
     subLay = [
-        [ psg.Button("Receive", key = "receiveData"), psg.Button("Send", key = "sendData"), psg.Button("End Turn", key = "endTurn") ],
+        [ psg.Button("Receive", key = "receiveData"), psg.Button("Send", key = "sendData"), psg.Button("End Turn", key = "endTurn"),
+            psg.Text("OFF", key = "controlSwitch") ],
         [ psg.Text("Choose To:"), psg.DropDown(["Nothing", "Reveal", "Unreveal"], key = "revealChoice", default_value = "Nothing"),
             psg.Text("From Your Hand, Or To:"), psg.DropDown(["Nothing", "Evolve", "Unevolve"], key = "evolveChoice", default_value = "Nothing"),
             psg.Text("On Your Field") ],
         [ psg.DropDown(["Nothing", "Increase", "Decrease"], key = "numChange", default_value = "Nothing"), psg.Text("The:"),
-            psg.DropDown(["Left/Only Value", "Right Value"], key = "sideSelect", default_value = "Left/Only Value:") ],
+            psg.DropDown(["Left/Only Value", "Right Value"], key = "sideSelect", default_value = "Left/Only Value") ],
         [ psg.Text("Move Card To:"), psg.DropDown(["Your", "Their"], key = "whoseZone", default_value = "Your"),
             psg.DropDown([ "Nowhere", "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Nowhere", key = "moveLoc") ],
         [ psg.Text("Add"), psg.Input(key = "createCard"), psg.Text("To Your:"),
@@ -248,10 +249,15 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
             psg.Button("Do It", key = "addButton") ],
         [ psg.Button("View Graveyard", key = "viewGrave", size = (12, 1)), psg.Button("View Banish", key = "viewBanish"),
             psg.Button("Draw Card", key = "drawCard"), psg.Button("Shuffle Deck", key = "shuffleDeck") ],
-        [ psg.Text("Randomly Choose A(n)"), psg.DropDown(["Follower", "Amulet", "Spell"], key = "randomType", default_value = "Follower"),
-            psg.Text("From Your"),
-            psg.DropDown([ "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Hand", key = "chooseLoc"),
-            psg.Text("Whose Cost Is:"), psg.DropDown(["Greater Than", "Less Than", "Equal To"], default_value = "Greater Than", key = "compare"),
+        [ psg.Text("Count The"), psg.DropDown(["Cards", "Followers", "Amulets", "Spells"], key = "countType", default_value = "Cards"),
+            psg.Text("In"), psg.DropDown(["Your", "Their"], default_value = "Your", key = "countWhoseZone"),
+            psg.DropDown([ "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Hand", key = "countLoc"),
+            psg.Text("With Cost:"), psg.DropDown(["Greater Than", "Less Than", "Equal To"], default_value = "Greater Than", key = "countCompare"),
+            psg.DropDown(["Any"] + [str(x) for x in list(range(21))], default_value = "Any", key = "compNum"), psg.Button("Do It", key = "countNow") ],
+        [ psg.Text("Choose A(n)"), psg.DropDown(["Card", "Follower", "Amulet", "Spell"], key = "randomType", default_value = "Card"),
+            psg.Text("From"), psg.DropDown(["Your", "Their"], default_value = "Your", key = "randomWhoseZone"),
+            psg.DropDown([ "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Hand", key = "randomLoc"),
+            psg.Text("With Cost:"), psg.DropDown(["Greater Than", "Less Than", "Equal To"], default_value = "Greater Than", key = "randomCompare"),
             psg.DropDown(["Any"] + [str(x) for x in list(range(21))], default_value = "Any", key = "compVal"), psg.Button("Do It", key = "rollDice") ]
     ]
     layout[6] = [
@@ -260,7 +266,7 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         psg.Column([[psg.Image("blank_card.png", key = "theiCardImage")]]),
     ]
 
-    window = psg.Window("", layout, grab_anywhere = True, resizable = True, auto_size_buttons = False)
+    window = psg.Window("", layout, grab_anywhere = True, resizable = True, return_keyboard_events = True, auto_size_buttons = False)
     while True:
         event, values = window.read()
         # See if user wants to quit or window was closed
@@ -271,16 +277,20 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
             break
 
         try:
-            longName = "results/" + window[event].get_text().replace(" ", "_")
-            if (os.path.exists(longName + "_base.png")):
-                window[event[0:4] + "CardImage"].update(filename = longName + "_base.png")
-                window.refresh()
-                if ((longName.endswith("EVOLVED") == True) and (os.path.exists(longName.split("_EVOLVED")[0] + "_evolved.png"))):
-                    window[event[0:4] + "CardImage"].update(filename = longName.split("_EVOLVED")[0].replace(" ", "_") + "_evolved.png")
-                    window.refresh()            
+            if ((":" not in event) and (len(event) > 2)):
+                longName = "results/" + window[event].get_text().replace(" ", "_")
+                if (os.path.exists(longName + "_base.png")):
+                    window[event[0:4] + "CardImage"].update(filename = longName + "_base.png")
+                    window.refresh()
+                    if ((longName.endswith("EVOLVED") == True) and (os.path.exists(longName.split("_EVOLVED")[0] + "_evolved.png"))):
+                        window[event[0:4] + "CardImage"].update(filename = longName.split("_EVOLVED")[0].replace(" ", "_") + "_evolved.png")
+                        window.refresh()            
         except:
             pass
-
+        
+        if (event == "Control_L:17"):
+            change = ["ON", "OFF"]
+            window["controlSwitch"].update(change[int(not change.index(window["controlSwitch"].get()))])
         if (event == "sendData"):
             while True:
                 try:
