@@ -238,12 +238,18 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         [ psg.Button("Receive", key = "receiveData"), psg.Button("Send", key = "sendData"), psg.Button("End Turn", key = "endTurn") ],
         [ psg.Text("Left/Only Value:"), psg.DropDown(["Nothing", "Increase", "Decrease"], key = "leftChange", default_value = "Nothing"),
             psg.Text("Right Value:"), psg.DropDown(["Nothing", "Increase", "Decrease"], key = "rightChange", default_value = "Nothing") ],
-        [ psg.Text("  Move Card To:"), psg.DropDown(["Your", "Their"], key = "whoseZone", default_value = "Your"),
-            psg.DropDown([ "Nowhere", "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Nowhere") ],
+        [ psg.Text("Move Card To:  "), psg.DropDown(["Your", "Their"], key = "whoseZone", default_value = "Your"),
+            psg.DropDown([ "Nowhere", "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Nowhere", key = "moveLoc") ],
+        [ psg.Text("Add"), psg.Input(key = "createCard"), psg.Text("To Your:"),
+            psg.DropDown([ "Nowhere", "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Nowhere", key = "addLoc"),
+            psg.Button("Do It", key = "addButton") ],
         [ psg.Button("View Graveyard", key = "viewGrave", size = (12, 1)), psg.Button("View Banish", key = "viewBanish"),
-            psg.Button("Draw Card", key = "drawCard") ],
-        [ psg.Text("Randomly:"), psg.DropDown(["Nothing"], key = "random", default_value = "Nothing"),
-            psg.DropDown([str(x + 1) for x in list(range(20))], default_value = "1"), psg.Button("Do It", key = "rollDice") ]
+            psg.Button("Draw Card", key = "drawCard"), psg.Button("Shuffle Deck", key = "shuffleDeck") ],
+        [ psg.Text("Randomly Choose A(n)"), psg.DropDown(["Follower", "Amulet", "Spell"], key = "randomType", default_value = "Follower"),
+            psg.Text("From Your"),
+            psg.DropDown([ "Nowhere", "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Nowhere", key = "chooseLoc"),
+            psg.Text("Whose Cost Is:"), psg.DropDown(["Nothing", "Greater Than", "Less Than", "Equal To"], default_value = "Nothing", key = "compare"),
+            psg.DropDown([str(x) for x in list(range(21))], default_value = "0", key = "compVal"), psg.Button("Do It", key = "rollDice") ]
     ]
     layout[6] = [
         psg.Column([[psg.Image("blank_card.png", key = "yourCardImage")]]),
