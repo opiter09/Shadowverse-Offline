@@ -234,29 +234,34 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
     layout[5] = layout[5] + [ psg.Button("20 LIFE", key = "yourLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "yourPlay", size = (12, 1)) ]
     
     subLay = [
-        [ psg.Button("Receive", key = "receiveData"), psg.Button("Send", key = "sendData"), psg.Text("OFF", key = "controlSwitch") ],
-        [ psg.Text("Choose To:"), psg.DropDown(["Nothing", "Reveal", "Unreveal"], key = "revealChoice", default_value = "Nothing"),
-            psg.Text("From Your Hand, Or To:"), psg.DropDown(["Nothing", "Evolve", "Unevolve"], key = "evolveChoice", default_value = "Nothing"),
-            psg.Text("On Your Field") ],
-        [ psg.DropDown(["Nothing", "Increase", "Decrease"], key = "numChange", default_value = "Nothing"), psg.Text("The:"),
-            psg.DropDown(["Left/Only Value", "Right/Only Value"], key = "sideSelect", default_value = "Left/Only Value") ],
-        [ psg.Text("Move Card To:"), psg.DropDown(["Your", "Their"], key = "whoseZone", default_value = "Your"),
-            psg.DropDown([ "Nowhere", "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Nowhere", key = "moveLoc") ],
-        [ psg.Text("Add"), psg.Input(key = "createCard"), psg.Text("To Your:"),
-            psg.DropDown([ "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Hand", key = "addLoc"),
+        [ psg.Button("Receive", key = "receiveData"), psg.Button("Send", key = "sendData") ],
+        [ psg.Text("Choose To"), psg.DropDown(["Reveal", "Unreveal", "Evolve", "Unevolve"], key = "flipChoice", default_value = "Reveal"),
+            psg.Text("Card #"), psg.Input(size = (3, 1), key = "flipNum"), psg.Text("From Your Hand/Field"), psg.Button("Do It", key = "flipButton") ],
+        [ psg.DropDown(["Increase", "Decrease"], key = "modifyDir", default_value = "Increase"), psg.Text("The"),
+            psg.DropDown(["Left/Only Value", "Right/Only Value"], key = "modifySide", default_value = "Left/Only Value"), psg.Text("Of Your"),
+            psg.DropDown(["Life", "Play Points", "Evo Points", "Evo Turns", "Counters", "Occurances", "Field 1", "Field 2", "Field 3", "Field 4",
+                "Field 5"], key = "modifyChoice", default_value = "Life"),
+            psg.Button("Do It", key = "modifyButton") ],
+        [ psg.Text("Move"), psg.Input(size = (24, 1), key = "moveCard"), psg.Text("From Your"),
+            psg.DropDown(["Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion"], default_value = "Hand", key = "moveLocOut"),
+            psg.Text("To"), psg.DropDown(["Your", "Their"], key = "moveWhoseZone", default_value = "Your"),
+            psg.DropDown(["Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion", "Deleted"], default_value = "Hand", key = "moveLocIn"),
+            psg.Button("Do It", key = "moveButton") ],
+        [ psg.Text("Add"), psg.Input(size = (33, 1), key = "createCard"), psg.Text("To Your"),
+            psg.DropDown(["Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion"], default_value = "Hand", key = "addLoc"),
             psg.Button("Do It", key = "addButton") ],
         [ psg.Button("View Graveyard", key = "viewGrave", size = (12, 1)), psg.Button("View Banish", key = "viewBanish"),
-            psg.Button("Draw Card", key = "drawCard"), psg.Button("Shuffle Deck", key = "shuffleDeck") ],
+            psg.Button("View Deck", key = "viewDeck"), psg.Button("Draw Card", key = "drawCard"), psg.Button("Shuffle Deck", key = "shuffleDeck") ],
         [ psg.Text("Count The"), psg.DropDown(["Cards", "Followers", "Amulets", "Spells"], key = "countType", default_value = "Cards"),
             psg.Text("In"), psg.DropDown(["Your", "Their"], default_value = "Your", key = "countWhoseZone"),
-            psg.DropDown([ "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Hand", key = "countLoc"),
-            psg.Text("With Cost:"), psg.DropDown(["Greater Than", "Less Than", "Equal To"], default_value = "Greater Than", key = "countCompare"),
-            psg.DropDown(["Any"] + [str(x) for x in list(range(21))], default_value = "Any", key = "compNum"), psg.Button("Do It", key = "countNow") ],
+            psg.DropDown(["Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion"], default_value = "Hand", key = "countLoc"),
+            psg.Text("With Cost"), psg.DropDown(["Greater Than", "Less Than", "Equal To"], default_value = "Greater Than", key = "countCompare"),
+            psg.Input(size = (3, 1), key = "randomCNum"), psg.Button("Do It", key = "countNow") ],
         [ psg.Text("Choose A(n)"), psg.DropDown(["Card", "Follower", "Amulet", "Spell"], key = "randomType", default_value = "Card"),
             psg.Text("From"), psg.DropDown(["Your", "Their"], default_value = "Your", key = "randomWhoseZone"),
-            psg.DropDown([ "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Hand", key = "randomLoc"),
-            psg.Text("With Cost:"), psg.DropDown(["Greater Than", "Less Than", "Equal To"], default_value = "Greater Than", key = "randomCompare"),
-            psg.DropDown(["Any"] + [str(x) for x in list(range(21))], default_value = "Any", key = "compVal"), psg.Button("Do It", key = "rollDice") ]
+            psg.DropDown(["Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion"], default_value = "Hand", key = "randomLoc"),
+            psg.Text("With Cost"), psg.DropDown(["Greater Than", "Less Than", "Equal To"], default_value = "Greater Than", key = "randomCompare"),
+            psg.Input(size = (3, 1), key = "chooseCNum"), psg.Button("Do It", key = "rollDice") ]
     ]
     layout[6] = [
         psg.Column([[psg.Image("blank_card.png", key = "yourCardImage")]]),
@@ -264,7 +269,7 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         psg.Column([[psg.Image("blank_card.png", key = "theiCardImage")]]),
     ]
 
-    window = psg.Window("", layout, grab_anywhere = True, resizable = True, return_keyboard_events = True, auto_size_buttons = False)
+    window = psg.Window("", layout, grab_anywhere = True, resizable = True, auto_size_buttons = False)
     while True:
         event, values = window.read()
         # See if user wants to quit or window was closed
@@ -275,21 +280,17 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
             break
 
         try:
-            if ((":" not in event) and (len(event) > 2)):
-                longName = "results/" + window[event].get_text().replace(" ", "_")
-                if (os.path.exists(longName + "_base.png")):
-                    window[event[0:4] + "CardImage"].update(filename = longName + "_base.png")
-                    window.refresh()
-                    if ((longName.endswith("EVOLVED") == True) and (os.path.exists(longName.split("_EVOLVED")[0] + "_evolved.png"))):
-                        window[event[0:4] + "CardImage"].update(filename = longName.split("_EVOLVED")[0].replace(" ", "_") + "_evolved.png")
-                        window.refresh()            
+            longName = "results/" + window[event].get_text().replace(" ", "_")
+            if (os.path.exists(longName + "_base.png")):
+                window[event[0:4] + "CardImage"].update(filename = longName + "_base.png")
+                window.refresh()
+                if ((longName.endswith("EVOLVED") == True) and (os.path.exists(longName.split("_EVOLVED")[0] + "_evolved.png"))):
+                    window[event[0:4] + "CardImage"].update(filename = longName.split("_EVOLVED")[0].replace(" ", "_") + "_evolved.png")
+                    window.refresh()            
         except:
             pass
-        
-        if (event == "Control_L:17"):
-            change = ["ON", "OFF"]
-            window["controlSwitch"].update(change[int(not change.index(window["controlSwitch"].get()))])
-        elif (event == "sendData"):
+
+        if (event == "sendData"):
             while True:
                 try:
                     sockS.sendall((json.dumps(transferState).encode("UTF-8")))
@@ -306,8 +307,11 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
                     psg.popup("Data transfer failed!")
                     break
             if (packet != ""):
-                transferState = json.loads(packet.replace("\"your", "xkcdxkcd").replace("\"their", "\"your").replace("xkcdxkcd", "\"their"))   
-                updateButtons(window, transferState, keyNames)
+                try:
+                    transferState = json.loads(packet.replace("\"your", "xkcdxkcd").replace("\"their", "\"your").replace("xkcdxkcd", "\"their"))   
+                    updateButtons(window, transferState, keyNames)
+                except:
+                    psg.popup("State data too large!")
 
     window.close()
     connectR.close()

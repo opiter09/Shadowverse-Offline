@@ -9,9 +9,9 @@ def searchWindow(table):
     pages = [ "Page 1", "Page 2", "Page 3", "Page 4", "Page 5", "Page 6", "Page 7", "Page 8", "Page 9", "Page 10" ]
     subLay = [
         [ psg.Text("Name:"), psg.Input(key = "name", enable_events = True, default_text = "") ],
-        [ psg.Text("   Text:"), psg.Input(key = "text", enable_events = True, default_text = "") ],
+        [ psg.Text("  Text:"), psg.Input(key = "text", enable_events = True, default_text = "") ],
         [ psg.Text("Rarity:"), psg.DropDown(["Any"] + rarities, key = "rarity", default_value = "Any") ],
-        [ psg.Text("Class:"), psg.DropDown(["Any"] + classes, key = "class", default_value = "Any") ],
+        [ psg.Text(" Class:"), psg.DropDown(["Any"] + classes, key = "class", default_value = "Any") ],
         [ psg.Text("  Type:"), psg.DropDown(["Any"] + types, key = "type", default_value = "Any") ],
         [ psg.Text("  Trait:"), psg.Input(key = "subtype", enable_events = True, default_text = "") ],
         [ 
@@ -47,6 +47,7 @@ def searchWindow(table):
             break
         elif ((event == "execute") or (event in [ "\r", "special 16777220", "special 16777221" ])): # if you press the Search button or Enter
             subset = []
+            names = []
             for card in table:
                 if ((values["name"].lower() in card["card_name"].lower()) and (values["text"].lower() in card["skill_disc"].lower())):
                     if ((values["rarity"] == "Any") or (card["rarity"] == rarities.index(values["rarity"]))):
@@ -59,7 +60,9 @@ def searchWindow(table):
                                                 if ((values["maxCost"] == "Any") or (card["cost"] <= int(values["maxCost"]))):
                                                     if ((values["maxAttack"] == "Any") or (card["atk"] <= int(values["maxAttack"]))):
                                                         if ((values["maxLife"] == "Any") or (card["life"] <= int(values["maxLife"]))):
-                                                            subset.append(card)
+                                                            if (card["card_name"] not in names):
+                                                                subset.append(card)
+                                                                names.append(card["card_name"])
             for i in range(10):
                 page = int(values["page"].split(" ")[1]) - 1
                 curr = i + (page * 10)
