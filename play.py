@@ -163,7 +163,6 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         e = ["2", "3"]
         
     transferState = {
-        "currentTurn": trick[first],
         "yourHand": yourBaseDeck[0:3] + (["BLANK"] * 6),
         "yourHandRevealed": [False] * 9,
         "yourDeck": yourBaseDeck[3:],
@@ -235,13 +234,12 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
     layout[5] = layout[5] + [ psg.Button("20 LIFE", key = "yourLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "yourPlay", size = (12, 1)) ]
     
     subLay = [
-        [ psg.Button("Receive", key = "receiveData"), psg.Button("Send", key = "sendData"), psg.Button("End Turn", key = "endTurn"),
-            psg.Text("OFF", key = "controlSwitch") ],
+        [ psg.Button("Receive", key = "receiveData"), psg.Button("Send", key = "sendData"), psg.Text("OFF", key = "controlSwitch") ],
         [ psg.Text("Choose To:"), psg.DropDown(["Nothing", "Reveal", "Unreveal"], key = "revealChoice", default_value = "Nothing"),
             psg.Text("From Your Hand, Or To:"), psg.DropDown(["Nothing", "Evolve", "Unevolve"], key = "evolveChoice", default_value = "Nothing"),
             psg.Text("On Your Field") ],
         [ psg.DropDown(["Nothing", "Increase", "Decrease"], key = "numChange", default_value = "Nothing"), psg.Text("The:"),
-            psg.DropDown(["Left/Only Value", "Right Value"], key = "sideSelect", default_value = "Left/Only Value") ],
+            psg.DropDown(["Left/Only Value", "Right/Only Value"], key = "sideSelect", default_value = "Left/Only Value") ],
         [ psg.Text("Move Card To:"), psg.DropDown(["Your", "Their"], key = "whoseZone", default_value = "Your"),
             psg.DropDown([ "Nowhere", "Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion" ], default_value = "Nowhere", key = "moveLoc") ],
         [ psg.Text("Add"), psg.Input(key = "createCard"), psg.Text("To Your:"),
@@ -291,7 +289,7 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         if (event == "Control_L:17"):
             change = ["ON", "OFF"]
             window["controlSwitch"].update(change[int(not change.index(window["controlSwitch"].get()))])
-        if (event == "sendData"):
+        elif (event == "sendData"):
             while True:
                 try:
                     sockS.sendall((json.dumps(transferState).encode("UTF-8")))
@@ -310,8 +308,6 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
             if (packet != ""):
                 transferState = json.loads(packet.replace("\"your", "xkcdxkcd").replace("\"their", "\"your").replace("xkcdxkcd", "\"their"))   
                 updateButtons(window, transferState, keyNames)
-        elif (event == "endTurn"):
-            transferState["currentTurn"] = trick[int(not trick.index(transferState["currentTurn"]))]
 
     window.close()
     connectR.close()
