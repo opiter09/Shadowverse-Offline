@@ -69,10 +69,10 @@ window.close()
 subprocess.Popen(["ipconfig"])
 yourAddress = psg.popup_get_text("Enter your IPv4 Address:")
 if (yourAddress == ""):
-    yourAddress = open("IPv4.txt", "rt").read()
+    yourAddress = open("IPv4.txt", "rt").read().split("\n")[0]
 theirAddress = psg.popup_get_text("Enter the other person's IPv4 Address:")
 if (theirAddress == ""):
-    theirAddress = open("IPv4.txt", "rt").read()
+    theirAddress = open("IPv4.txt", "rt").read().split("\n")[1]
 sockS = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sockR = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 if (result2 == "host"):
