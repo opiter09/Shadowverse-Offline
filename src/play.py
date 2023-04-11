@@ -415,9 +415,10 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         elif (event in ["viewGraveyard", "viewDeck", "viewBanish"]):
             layout2 = [[], [], [], [], [], [], [], [], [], []]
             count = -1
-            shuffled = transferState["your" + event[4:]][0:50].copy()
-            random.shuffle(shuffled)
-            for name in shuffled:
+            copied = transferState["your" + event[4:]].copy()
+            if (event == "viewDeck"):
+                random.shuffle(copied)
+            for name in copied:
                 count = count + 1
                 layout2[count // 5].append(psg.Button(name, size = (15, 2)))                
             window2 = psg.Window("", layout2, grab_anywhere = True, auto_size_buttons = False, keep_on_top = True)           
