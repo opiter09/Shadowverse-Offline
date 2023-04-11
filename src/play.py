@@ -382,7 +382,9 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
                     if (locOut in ["yourHand", "yourField"]):
                         transferState[locOut] = transferState[locOut][0:i] + transferState[locOut][(i + 1):] + ["BLANK"]
                         if (locOut == "yourHand"):
-                            transferState["yourHandRevealed"][i] = transferState["yourHandRevealed"][i + 1]
+                            before = transferState["yourHandRevealed"][0:i].copy()
+                            after = transferState["yourHandRevealed"][(i + 1):].copy()
+                            transferState["yourHandRevealed"] = before + after + [False]
                         break
                     else:
                         transferState[locOut].remove(transferState[locOut][i])
