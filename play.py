@@ -265,12 +265,12 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
             psg.Text("In"), psg.DropDown(["Your", "Their"], default_value = "Your", key = "countWhoseZone"),
             psg.DropDown(["Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion"], default_value = "Hand", key = "countLoc"),
             psg.Text("With Cost"), psg.DropDown(["Greater Than", "Less Than", "Equal To"], default_value = "Greater Than", key = "countCompare"),
-            psg.Input(size = (3, 1), key = "countCNum"), psg.Button("Do It", key = "countButton") ],
+            psg.Input(size = (3, 1), key = "countCNum", default_text = "0"), psg.Button("Do It", key = "countButton") ],
         [ psg.Text("Choose A(n)"), psg.DropDown(["Card", "Follower", "Amulet", "Spell"], key = "randomType", default_value = "Card"),
             psg.Text("From"), psg.DropDown(["Your", "Their"], default_value = "Your", key = "randomWhoseZone"),
             psg.DropDown(["Hand", "Field", "Deck", "Graveyard", "Banish", "Fusion"], default_value = "Hand", key = "randomLoc"),
             psg.Text("With Cost"), psg.DropDown(["Greater Than", "Less Than", "Equal To"], default_value = "Greater Than", key = "randomCompare"),
-            psg.Input(size = (3, 1), key = "randmCNum"), psg.Button("Do It", key = "randomButton") ]
+            psg.Input(size = (3, 1), key = "randomCNum", default_text = "0"), psg.Button("Do It", key = "randomButton") ]
     ]
     layout[6] = [
         psg.Column([[psg.Image("blank_card.png", key = "yourCardImage")]]),
@@ -464,6 +464,8 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
                     if ((card["card_name"] == name) and (card["char_type"] in ourTypes) and (card["cost"] in compList)):
                         results.append(name)
                         break
+            if (len(results) == 0):
+                results = ["NONE"]
             psg.popup(random.choice(results))          
         else:
             static = 1
