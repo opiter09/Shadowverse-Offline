@@ -9,9 +9,9 @@ def searchWindow(table):
     pages = [ "Page 1", "Page 2", "Page 3", "Page 4", "Page 5", "Page 6", "Page 7", "Page 8", "Page 9", "Page 10" ]
     subLay = [
         [ psg.Text("Name:"), psg.Input(key = "name", enable_events = True, default_text = "") ],
-        [ psg.Text("  Text:"), psg.Input(key = "text", enable_events = True, default_text = "") ],
+        [ psg.Text("   Text:"), psg.Input(key = "text", enable_events = True, default_text = "") ],
         [ psg.Text("Rarity:"), psg.DropDown(["Any"] + rarities, key = "rarity", default_value = "Any") ],
-        [ psg.Text(" Class:"), psg.DropDown(["Any"] + classes, key = "class", default_value = "Any") ],
+        [ psg.Text("Class:"), psg.DropDown(["Any"] + classes, key = "class", default_value = "Any") ],
         [ psg.Text("  Type:"), psg.DropDown(["Any"] + types, key = "type", default_value = "Any") ],
         [ psg.Text("  Trait:"), psg.Input(key = "subtype", enable_events = True, default_text = "") ],
         [ 
@@ -38,7 +38,7 @@ def searchWindow(table):
             psg.Column(subLay), psg.Column([[psg.Image("blank_card.png", key = "cardImage"), psg.Image("blank_card.png", key = "cardImageEvo")]])
         ]
     ]
-    window = psg.Window("", layout, grab_anywhere = True, resizable = True, return_keyboard_events = True, font = 20)
+    window = psg.Window("", layout, grab_anywhere = True, resizable = True, return_keyboard_events = True, font = "-size 12")
 
     while True:
         event, values = window.read()
