@@ -3,7 +3,6 @@ import sys
 import PySimpleGUI as psg
 import json
 import subprocess
-import base64
 import socket
 import combine
 import search
@@ -70,10 +69,10 @@ window.close()
 subprocess.Popen(["ipconfig"])
 yourAddress = psg.popup_get_text("Enter your IPv4 Address:")
 if (yourAddress == ""):
-    yourAddress = base64.b64decode("MTkyLjE2OC4xLjIyNg==").decode("UTF-8")
+    yourAddress = "149.125.151.14"
 theirAddress = psg.popup_get_text("Enter the other person's IPv4 Address:")
 if (theirAddress == ""):
-    theirAddress = base64.b64decode("MTkyLjE2OC4xLjIyNg==").decode("UTF-8")
+    theirAddress = "149.125.151.14"
 sockS = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sockR = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 if (result2 == "host"):
