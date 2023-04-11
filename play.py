@@ -370,24 +370,29 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
                     transferState[mapping[values["modifyChoice"]][side]] = max(0, transferState[mapping[values["modifyChoice"]][side]] - 1)
         elif (event == "moveButton"):
             locOut = "your" + values["moveLocOut"]
+            locIn = values["moveWhoseZone"].lower() + values["moveLocIn"]
             if (values["moveCard"] not in transferState[locOut]):
                 psg.popup("No copies of that card are in that zone!")
+                continue
+            elif ((values["moveLocIn"] in ["Hand", "Field"]) and ("BLANK" not in transferState[locIn])):
+                psg.popup("This zone is full! You may need to send the card to Deletion instead!")
                 continue
             for i in range(len(transferState[locOut])):
                 if (transferState[locOut][i] == values["moveCard"]):
                     if (locOut in ["yourHand", "yourField"]):
                         transferState[locOut] = transferState[locOut][0:i] + transferState[locOut][(i + 1):] + ["BLANK"]
+                        if (locOut == "yourHand"):
+                            transferState["yourHandRevealed"][i] = transferState["yourHandRevealed"][i + 1]
                         break
                     else:
                         transferState[locOut].remove(transferState[locOut][i])
                         break
             if (values["moveLocIn"] != "Deletion"):
-                locIn = values["moveWhoseZone"].lower() + values["moveLocIn"]
-                if (values["moveLocIn"] in ["Hand, Field"]):
-                    if ("BLANK" not in transferState[locIn]):
-                        psg.popup("This zone is full! You may need to send the card to Deletion instead!")
-                    else:
-                        transferState[locIn] = [values["moveCard"]] + transferState[locIn][0:-1]
+                if (values["moveLocIn"] in ["Hand", "Field"]):
+                    transferState[locIn] = [values["moveCard"]] + transferState[locIn][0:-1]
+                    if (values["moveLocIn"] == "Hand"):
+                        rev = transferState[values["moveWhoseZone"].lower() + "HandRevealed"][0:-1].copy()
+                        transferState[values["moveWhoseZone"].lower() + "HandRevealed"] = [False] + rev
                 else:
                     transferState[locIn] = [values["moveCard"]] + transferState[locIn]
         elif (event == "addButton"):
@@ -395,11 +400,14 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
                 psg.popup("This is not the name of a real card!")
                 continue
             locIn = values["addWhoseZone"].lower() + values["addLoc"]
-            if (values["addLoc"] in ["Hand, Field"]):
+            if (values["addLoc"] in ["Hand", "Field"]):
                 if ("BLANK" not in transferState[locIn]):
                     psg.popup("This zone is full! You may need to ignore the addition!")
                 else:
                     transferState[locIn] = [values["createCard"]] + transferState[locIn][0:-1]
+                    if (values["addLoc"] == "Hand"):
+                        rev = transferState[values["addWhoseZone"].lower() + "HandRevealed"][0:-1].copy()
+                        transferState[values["addWhoseZone"].lower() + "HandRevealed"] = [False] + rev
             else:
                 transferState[locIn] = [values["createCard"]] + transferState[locIn]
         elif (event in ["viewGraveyard", "viewDeck", "viewBanish"]):
@@ -419,6 +427,8 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
             else:
                 transferState["yourHand"] = [transferState["yourDeck"][0]] + transferState["yourHand"][0:-1]
                 transferState["yourDeck"] = transferState["yourDeck"][1:]
+                rev = transferState["yourHandRevealed"][0:-1].copy()
+                transferState["yourHandRevealed"] = [False] + rev
         elif (event == "shuffleDeck"):
             random.shuffle(transferState["yourDeck"])
         elif (event == "countButton"):
