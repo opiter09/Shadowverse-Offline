@@ -6,10 +6,11 @@ all the app's menus, and you will be able to play with any card that exists in t
 
 THE HOST NEEDS TO START (AND GO THROUGH ALL THREE MENUS) BEFORE THE CLIENT!!!
 
-# Note
-This program is designed to run on Windows. Normally, the whole Python thing would make it quite portable, but there are a few things Stack Overflow tells me work a little differently
-on other platforms. Here is a list of differences I have found:
-- subprocess.Popen(["ipconfig"]) in main.py needs to be replaced with subprocess.Popen(["ifconfig"]) on Linux, or...something on Mac
+This program requires both you and your friend's IP Address. To get that, open the Command Prompt (in Windows) and type in "ipconfig." The value you see will be listed as the
+"IPv4 address." To save time, you can write both addresses in the provied IPv4.txt file, with your address on one line, and your friend's on the next. Then, when prompted for
+your addresses, just hit "Ok" without typing anything in.
+
+To download these files, please press the green "Code" button, then choose "Download ZIP."
 
 # Credits
 - Thanks to PySimpleGUI, for making it very easy for me to make GUIs for this stuff
