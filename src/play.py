@@ -181,7 +181,7 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         "yourLife": 20,
         "yourCurrentPlayPoints": 0,
         "yourMaxPlayPoints": 0,
-        "yourCurrentEvoPoints": e[1],
+        "yourCurrentEvoPoints": 0,
         "yourMaxEvoPoints": e[1],
         "yourEvoWait": 4,
         "yourClassCounters": 0,
@@ -199,7 +199,7 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
         "theirLife": 20,
         "theirCurrentPlayPoints": 0,
         "theirMaxPlayPoints": 0,
-        "theirCurrentEvoPoints": e[0],
+        "theirCurrentEvoPoints": 0,
         "theirMaxEvoPoints": e[0],
         "theirEvoWait": 4,
         "theirClassCounters": 0,
@@ -230,13 +230,13 @@ def playBall(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirR
                                                     enable_events = True) ]
 
     layout[0] = layout[0] + [ psg.Button("20 LIFE", key = "theirLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "theirPlay", size = (12, 1)) ]
-    layout[1] = layout[1] + [ psg.Button(str(e[0]) + " / " + str(e[0]) + " EVOLVE", key = "theirEvo", size = (12, 1)),
+    layout[1] = layout[1] + [ psg.Button("0 / " + str(e[0]) + " EVOLVE", key = "theirEvo", size = (12, 1)),
                                 psg.Button("4 TURNS", key = "theirTurns", size = (12, 1)) ]
     layout[2] = layout[2] + [ psg.Button("0 COUNTERS", key = "theirCounters", size = (12, 2)),
                                 psg.Button("X TIMES", key = "theirOccurences", size = (12, 2)) ]
     layout[3] = layout[3] + [ psg.Button("0 COUNTERS", key = "yourCounters", size = (12, 2)),
                                 psg.Button("0 TIMES", key = "yourOccurences", size = (12, 2)) ]
-    layout[4] = layout[4] + [ psg.Button(str(e[1]) + " / " + str(e[1]) + " EVOLVE", key = "yourEvo", size = (12, 1)),
+    layout[4] = layout[4] + [ psg.Button("0 / " + str(e[1]) + " EVOLVE", key = "yourEvo", size = (12, 1)),
                                 psg.Button("4 TURNS", key = "yourTurns", size = (12, 1)) ]
     layout[5] = layout[5] + [ psg.Button("20 LIFE", key = "yourLife", size = (12, 1)), psg.Button("0 / 0 PLAY", key = "yourPlay", size = (12, 1)) ]
     

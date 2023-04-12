@@ -63,12 +63,32 @@ def createImages(table):
                         temp = temp + "  " + item + "  "
             else:
                 temp = temp + line + (" " * 28)
-
+        im = Image.new("RGBA", size = (336, 468), color = (255, 255, 255)) # 28 x 39
+        
+        if (len(temp) > (28 * 37)):
+            text = [ "", "", card["card_name"], "BASE   " + "   (" + str(card["cost"]) + ")", "[" + rarities[card["rarity"]] + "] " \
+            + types[card["char_type"]], classes[card["clan"]] + " " + card["tribe_name"], "", "" ] \
+            + card["skill_disc"].replace("<br><br>", "<br>").replace("<br>", "\n").replace("[b]", "").replace("[\b]", "").split("\n")
+            if (card["char_type"] == 1):
+                text = text + [ "", "", "ATK: " + str(card["atk"]) + "   DEF: " + str(card["life"]) ]         
+            temp = ""
+            for line in text:
+                if (len(line) != 0):
+                    new = textwrap.wrap(line, width = 24)
+                    for item in new:
+                        if ((len(item) % 24) != 0):
+                            temp = temp + "  " + item + (" " * (24 - (len(item) % 24))) + "  "
+                        else:
+                            temp = temp + "  " + item + "  "
+                else:
+                    temp = temp + line + (" " * 28)
+        if (len(temp) > (28 * 37)):
+            print(card["card_name"])
         im = Image.new("RGBA", size = (336, 468), color = (255, 255, 255)) # 28 x 39
         count = -1
         for ch in temp:
             count = count + 1
-            if (count >= (28 * 39)):
+            if (count >= (28 * 37)):
                 break
             else:
                 sub = Image.open("./pieces/" + str(corr.index(ch) + 1) + ".png")
@@ -97,12 +117,31 @@ def createImages(table):
                         temp = temp + "  " + item + "  "
             else:
                 temp = temp + line + (" " * 28)
-
         im = Image.new("RGBA", size = (336, 468), color = (255, 255, 255)) # 28 x 39
+        
+        if (len(temp) > (28 * 37)):
+            text = [ "", "", card["card_name"], "EVOLVED" + "   (" + str(card["cost"]) + ")", "[" + rarities[card["rarity"]] + "] " \
+            + types[card["char_type"]], classes[card["clan"]] + " " + card["tribe_name"], "", "" ] \
+            + card["evo_skill_disc"].replace("<br><br>", "<br>").replace("<br>", "\n").replace("[b]", "").replace("[\b]", "").split("\n")
+            if (card["char_type"] == 1):
+                text = text + [ "", "", "ATK: " + str(card["evo_atk"]) + "   DEF: " + str(card["evo_life"]) ]            
+            temp = ""
+            for line in text:
+                if (len(line) != 0):
+                    new = textwrap.wrap(line, width = 24)
+                    for item in new:
+                        if ((len(item) % 24) != 0):
+                            temp = temp + "  " + item + (" " * (24 - (len(item) % 24))) + "  "
+                        else:
+                            temp = temp + "  " + item + "  "
+                else:
+                    temp = temp + line + (" " * 28)
+        if (len(temp) > (28 * 37)):
+            print(card["card_name"] + " EVOLVED")
         count = -1
         for ch in temp:
             count = count + 1
-            if (count >= (28 * 39)):
+            if (count >= (28 * 37)):
                 break
             else:
                 sub = Image.open("./pieces/" + str(corr.index(ch) + 1) + ".png")
@@ -110,4 +149,4 @@ def createImages(table):
                 sub.close()
         im.save("results/" + card["card_name"].replace(" ", "_").replace("//", "~") + "_evolved.png")
         
-        print(card["card_name"] + " finished")
+        # print(card["card_name"] + " finished")
