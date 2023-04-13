@@ -8,17 +8,19 @@ import socket
 
 first = -1
 def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive):
-    file = psg.popup_get_file("Select your deck file:", file_types = [("Text Files", "*.txt")])
-    if (os.path.exists(file) == False):
+    file = psg.popup_get_file("Select your deck file:", file_types = [("Text Files", "*.txt")], grab_anywhere = True)
+    if (file == None):
+        return(None)
+    elif (os.path.exists(file) == False):
         file = "Deck.txt"
-
+    
     f = open(file, "rt")
     deck = f.read().split("\n")
     f.close()
     
     if (len(deck) != 40):
         print("Invalid deck! Improper deck size detected!")
-        return(None, None)
+        return(None)
 
     bad = 0
     prev = "Neutral"
@@ -44,14 +46,14 @@ def deckImport(table, role, sockS, sockR, yourSend, yourReceive, theirSend, thei
             bad = 2
     if (bad == 1):
         print("Invalid deck! Cards of multiple classes detected!")
-        return(None, None)
+        return(None)
     elif (bad == 2):
         print("Invalid deck! Nonexistant cards detected!")
-        return(None, None)
+        return(None)
     for val in counts.values():
         if (val > 3):
             print("Invalid deck! More than three copies of a card detected!")
-            return(None, None)
+            return(None)
 
     random.shuffle(deck)
     global first
