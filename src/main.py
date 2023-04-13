@@ -48,7 +48,7 @@ window.close()
 
 if (result == "search"):
     search.searchWindow(realData)
-else:
+elif (result == "play"):
     result2 = ""
     layout = [ [ psg.Text("Choose a role:") ], [ psg.Button("Host"), psg.Button("Client") ] ]
     window = psg.Window("", layout, grab_anywhere = True)
@@ -64,29 +64,30 @@ else:
             result2 = "client"
             break
     window.close()
-
-    yourAddress = psg.popup_get_text("Enter your IPv4 Address:")
-    if (yourAddress == ""):
-        file = open("IPv4.txt", "rt")
-        yourAddress = file.read().split("\n")[0]
-        file.close()
-    theirAddress = psg.popup_get_text("Enter the other person's IPv4 Address:")
-    if (theirAddress == ""):
-        file = open("IPv4.txt", "rt")
-        theirAddress = file.read().split("\n")[1]
-        file.close()
-    sockS = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sockR = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    if (result2 == "host"):
-        yourSend = (yourAddress, 10000)
-        yourReceive = (yourAddress, 10001)
-        theirSend = (theirAddress, 8080)
-        theirReceive = (theirAddress, 8081)
-    elif (result2 == "client"):
-        yourSend = (yourAddress, 8080)
-        yourReceive = (yourAddress, 8081)
-        theirSend = (theirAddress, 10000)
-        theirReceive = (theirAddress, 10001)
-    sockS.bind(yourSend)
-    sockR.bind(yourReceive)
-    play.playBall(realData, result2, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive)
+    
+    if (result2 != ""):
+        yourAddress = psg.popup_get_text("Enter your IPv4 Address:")
+        if (yourAddress == ""):
+            file = open("IPv4.txt", "rt")
+            yourAddress = file.read().split("\n")[0]
+            file.close()
+        theirAddress = psg.popup_get_text("Enter the other person's IPv4 Address:")
+        if (theirAddress == ""):
+            file = open("IPv4.txt", "rt")
+            theirAddress = file.read().split("\n")[1]
+            file.close()
+        sockS = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sockR = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        if (result2 == "host"):
+            yourSend = (yourAddress, 10000)
+            yourReceive = (yourAddress, 10001)
+            theirSend = (theirAddress, 8080)
+            theirReceive = (theirAddress, 8081)
+        elif (result2 == "client"):
+            yourSend = (yourAddress, 8080)
+            yourReceive = (yourAddress, 8081)
+            theirSend = (theirAddress, 10000)
+            theirReceive = (theirAddress, 10001)
+        sockS.bind(yourSend)
+        sockR.bind(yourReceive)
+        play.playBall(realData, result2, sockS, sockR, yourSend, yourReceive, theirSend, theirReceive)
