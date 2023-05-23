@@ -1,3 +1,4 @@
+![Screenshot (443)](https://github.com/opiter09/Shadowverse-Offline/assets/92452568/27ae7b75-e8d7-401c-81f1-35e3bb9106d1)
 # Shadowverse-Offline
 This is a stupid little project that lets you search and sort of play with Shadowverse cards offline. The cards are just images of the text, without artwork or voice acting or anything,
 so it's nothing like the actual game. This game "engine" has very little actual rules enforcement, similar to the website https://www.untap.in.
