@@ -19,4 +19,4 @@ all the app's menus, and you are able to play with any card that exists in the g
 - Thanks to PySimpleGUI, for making it very easy for me to make GUIs for this stuff
 - Thanks to zxt for making https://github.com/zxt/shadowverse-portal, which is how I original got the card data json
 - Thanks to the tcod team, for creating the font used in the cards. This font is in the public domain, and is originally from here:
-  https://github.com/libtcod/python-tcod/tree/11.13.5/fonts/libtcod
+  https://github.com/libtcod/python-tcod/blob/11.13.5/fonts/libtcod/terminal12x12_gs_ro.png
