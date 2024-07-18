@@ -1,5 +1,5 @@
 import os
-import PySimpleGUI as psg
+import FreeSimpleGUI as psg
 import json
 
 def searchWindow(table):
