@@ -1,6 +1,6 @@
 import os
 import sys
-import PySimpleGUI as psg
+import FreeSimpleGUI as psg
 import json
 import random
 import time
